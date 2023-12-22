@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* customs css */
+
+.primary-color {
+  color: #38A04F;
+}
+
+.secondary-color {
+  color: #121212;
+}
+
+.blue-color {
+  color: #4366AC;
+}
+
+.text-color {
+  color: #656565;
+}
+.section-header {
+  color: #121212;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  text-transform: capitalize;
+}
+
+@media (max-width: 768px) {
+  .section-header {
+    font-size: 16px;
+  }
+}
