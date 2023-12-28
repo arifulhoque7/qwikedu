@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SingleCourse from "./SingleCourse";
 
 const CourseContent = () => {
@@ -105,17 +105,117 @@ const CourseContent = () => {
     },
   ];
 
+  const subCategories = {
+    Design: [
+      "Graphic Design",
+      "UI/UX Design",
+      "3D Design",
+      "Visual Design",
+      // Add more subcategories for Design as needed
+    ],
+    Engineering: [
+      "Mechanical Engineering",
+      "Electrical Engineering",
+      "Civil Engineering",
+      // Add more subcategories for Engineering as needed
+    ],
+    // Add subcategories for other categories as needed
+  };
+
+  const subSubCategories = {
+    "Graphic Design": [
+      "Print Design",
+      "Visual Design",
+      "Logo & Brand",
+      "Art & Illustration",
+    ],
+    "UI/UX Design": [
+      "Website Design",
+      "App Design",
+      "Icon Design",
+      "Landing Page Design",
+    ],
+    "3D Design": [
+      "3D Architecture",
+      "3D Industrial Design",
+      "3D Fashion & Garment",
+      "3D Printing Characters",
+      "3D Landscape",
+      "3D Game Art",
+      "3D Jewelry design",
+    ],
+    "Visual Design": [
+      "Image Editing",
+      "Presentation Design",
+      "Background Removal",
+      "Vector Tracing",
+      "Resume Design",
+    ],
+  };
+
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showCategoryBox, setShowCategoryBox] = useState(false);
+  const [submenuPosition, setSubmenuPosition] = useState({ top: 0, left: 0 });
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
     setShowCategoryBox(true);
+
+    const rect = event.target.getBoundingClientRect();
+    setSubmenuPosition({
+      top: rect.bottom + window.scrollY + 10,
+      left: rect.left + window.scrollX,
+    });
+    console.log("Selected Category:", category);
   };
 
-  const filteredCourses = selectedCategory
-    ? courses.filter((course) => course.category === selectedCategory)
-    : [];
+  const categoryBoxRef = useRef(null);
+
+  const handleOutsideClick = (e) => {
+    if (categoryBoxRef.current && !categoryBoxRef.current.contains(e.target)) {
+      setShowCategoryBox(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
+  const categorySubmenu =
+    selectedCategory && subCategories[selectedCategory] ? (
+      <div
+        ref={categoryBoxRef}
+        className="w-[1090px] p-6 flex flex-wrap items-start gap-32 border border-[#BEEAC8] bg-white"
+        style={{
+          position: "absolute",
+          top: submenuPosition.top,
+          left: submenuPosition.left,
+          zIndex: 100,
+        }}
+      >
+        {Object.keys(subCategories).includes(selectedCategory) &&
+          subCategories[selectedCategory].map((subcategory, subIndex) => (
+            <div key={subIndex}>
+              <h3 className="font-semibold">{subcategory}</h3>
+              <ul className="mt-7">
+                {/* Check if the key exists in subSubCategories */}
+                {subSubCategories[subcategory] &&
+                  subSubCategories[subcategory].map(
+                    (subSubcategory, ssIndex) => (
+                      <li key={ssIndex} className="mb-2">
+                        {subSubcategory}
+                      </li>
+                    )
+                  )}
+              </ul>
+            </div>
+          ))}
+      </div>
+    ) : null;
 
   return (
     <>
@@ -132,9 +232,9 @@ const CourseContent = () => {
             <path
               d="M8.40039 16.5L0.900391 9M0.900391 9L8.40039 1.5M0.900391 9H18.9004"
               stroke="black"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
 
@@ -151,8 +251,6 @@ const CourseContent = () => {
             </div>
           ))}
 
-        
-
           {/* Right arrow icon */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -164,13 +262,16 @@ const CourseContent = () => {
             <path
               d="M13.5996 4.5L21.0996 12M21.0996 12L13.5996 19.5M21.0996 12L3.09961 12"
               stroke="black"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </div>
       </div>
+
+      {showCategoryBox && categorySubmenu}
+
       <SingleCourse courses={courses} />
       <div className="flex justify-center">
         <button className="border border-[#4366AC] rounded-md px-3 py-2 my-1 bg-[#4366AC] text-[#FFFFFF] text-bold">
